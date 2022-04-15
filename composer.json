@@ -1,0 +1,33 @@
+{
+    "name": "sudobee/cygnus",
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "inertiajs/inertia-laravel": "^0.5.4",
+        "giggsey/libphonenumber-for-php": "^8.12.46",
+        "spatie/laravel-package-tools": "^1.11.3",
+        "illuminate/contracts": "^9.8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "SudoBee\\Cygnus\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SudoBee\\Cygnus\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SudoBee\\Cygnus\\CygnusServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
