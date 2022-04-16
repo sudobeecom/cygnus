@@ -98,7 +98,7 @@ return array_merge(parent::share($request), [
 
 9. Add to RouteServiceProvider getHomepage() method
 ```php
-public static function getAuthorizedUserHomepage(): string
+public static function getHomepage(): string
 {
     return self::HOME;
 }
