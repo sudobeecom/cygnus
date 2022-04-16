@@ -96,7 +96,7 @@ return array_merge(parent::share($request), [
 ]);
 ```
 
-9. Add to RouteServiceProvider getAuthorizedUserHomepage() method
+9. Add to RouteServiceProvider getHomepage() method
 ```php
 public static function getAuthorizedUserHomepage(): string
 {
