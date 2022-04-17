@@ -4,6 +4,7 @@ namespace SudoBee\Cygnus\Authentication\Pages;
 
 use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Route;
+use SudoBee\Cygnus\Authentication\Operations\LogoutOperation;
 
 class AuthenticationPages
 {
@@ -11,6 +12,7 @@ class AuthenticationPages
 	public static function register(bool $enableRegistration = false): void
 	{
 		LoginPage::register();
+		LogoutOperation::register();
 
 		if ($enableRegistration) {
 			RegisterPage::register();
