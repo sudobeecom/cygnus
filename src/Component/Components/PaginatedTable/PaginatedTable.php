@@ -16,12 +16,10 @@ class PaginatedTable extends Table
 {
 	private int $perPage = 10;
 
-	/** @phpstan-ignore-next-line  */
-	private Relation|Builder|null $query = null;
+	/** @var Relation<Model>|Builder<Model>|\Illuminate\Database\Query\Builder|null $query  */
+	private Relation|Builder|\Illuminate\Database\Query\Builder|null $query = null;
 
-	/**
-	 * @var callable(mixed): TableRow
-	 */
+	/** @var callable(Model): TableRow */
 	private $row;
 
 	public static function make(): self
@@ -30,11 +28,12 @@ class PaginatedTable extends Table
 	}
 
 	/**
-	 * @phpstan-ignore-next-line
+	 * @param Relation<Model>|Builder<Model>|\Illuminate\Database\Query\Builder $query
 	 * @return static
 	 */
-	public function setQuery(Relation|Builder $query)
-	{
+	public function setQuery(
+		Relation|Builder|\Illuminate\Database\Query\Builder $query
+	) {
 		$this->query = $query;
 
 		return $this;
@@ -52,7 +51,7 @@ class PaginatedTable extends Table
 	}
 
 	/**
-	 * @param callable(mixed): TableRow $row
+	 * @param callable(Model): TableRow $row
 	 * @return static
 	 */
 	public function setRow(callable $row)
