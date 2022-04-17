@@ -6,7 +6,7 @@ use App\Cygnus\OperationStore;
 
 trait HasStore
 {
-	public OperationStore $store;
+	protected OperationStore $store;
 
 	final protected function initStore(): void
 	{

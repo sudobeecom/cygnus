@@ -3,6 +3,7 @@
 namespace SudoBee\Cygnus\Page;
 
 use SudoBee\Cygnus\Component\Component;
+use SudoBee\Cygnus\Core\Traits\HasRegisterRoutes;
 use SudoBee\Cygnus\Core\Traits\HasResolveHelpers;
 use SudoBee\Cygnus\Core\Utilities\ExportBuilder;
 use SudoBee\Cygnus\Form\Operation;
@@ -21,6 +22,7 @@ use Inertia\Response;
 abstract class Page extends Controller
 {
 	use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+	use HasRegisterRoutes;
 	use HasResolveHelpers;
 
 	abstract public function title(): string;
@@ -112,23 +114,17 @@ abstract class Page extends Controller
 		]);
 	}
 
-	public static function register(): void
+	public function registerRoutes(): void
 	{
-		$pageClass = get_called_class();
-
-		/** @var Page $page */
-		/** @phpstan-ignore-next-line */
-		$page = new $pageClass();
-
-		foreach ($page->operations() as $operationClass) {
+		foreach ($this->operations() as $operationClass) {
 			/** @var Operation $operation */
 			$operation = new $operationClass();
 
 			$operation::register();
 		}
 
-		$routeName = $page->routeName();
-		$route = Router::get($page->route(), [$pageClass, "handleRequest"]);
+		$routeName = $this->routeName();
+		$route = Router::get($this->route(), fn() => $this->handleRequest());
 		if ($routeName !== null) {
 			$route->name($routeName);
 		}

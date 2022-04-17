@@ -2,8 +2,11 @@
 
 namespace SudoBee\Cygnus\Form;
 
+use SudoBee\Cygnus\Core\Traits\HasRegisterRoutes;
 use SudoBee\Cygnus\Core\Traits\HasResolveHelpers;
 use SudoBee\Cygnus\Core\Utilities\Notification;
+use SudoBee\Cygnus\Form\Actions\HandleExceptionGracefullyAction;
+use SudoBee\Cygnus\Form\Actions\IsInertiaRequestAction;
 use SudoBee\Cygnus\Form\Enums\OperationResponseType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +18,7 @@ use Throwable;
 
 abstract class Operation
 {
+	use HasRegisterRoutes;
 	use HasResolveHelpers;
 
 	/** @var array<string, string> $parameters */
@@ -79,7 +83,9 @@ abstract class Operation
 		try {
 			$this->updateStore();
 
-			$isInertiaRequest = $this->isInertiaRequest($request);
+			$isInertiaRequest = app(IsInertiaRequestAction::class)->execute(
+				$request
+			);
 
 			if (!$this->authorize()) {
 				Notification::danger("You do not have permission for that.");
@@ -111,60 +117,11 @@ abstract class Operation
 				"notification" => Notification::getAndClear(),
 			]);
 		} catch (Throwable $throwable) {
-			return $this->handleExceptionGracefully($request, $throwable);
+			return app(HandleExceptionGracefullyAction::class)->execute(
+				$request,
+				$throwable
+			);
 		}
-	}
-
-	/**
-	 * @throws ValidationException
-	 */
-	private function handleExceptionGracefully(
-		Request $request,
-		Throwable $throwable
-	): JsonResponse|RedirectResponse {
-		$isInertiaRequest = $this->isInertiaRequest($request);
-
-		if ($throwable instanceof ValidationException) {
-			if ($isInertiaRequest) {
-				/**
-				 * Validation exception will be handled
-				 * by InertiaJS
-				 */
-				throw $throwable;
-			}
-
-			return response()->json([
-				"success" => false,
-				"data" => null,
-				"errors" => array_map(
-					fn($fieldErrors) => $fieldErrors[0],
-					$throwable->errors()
-				),
-				"notification" => Notification::getAndClear(),
-			]);
-		}
-
-		report($throwable);
-
-		Notification::danger(
-			"Sorry for inconvenience, please try again later."
-		);
-
-		if ($isInertiaRequest) {
-			return redirect()->back();
-		}
-
-		return response()->json([
-			"success" => false,
-			"data" => null,
-			"errors" => [],
-			"notification" => Notification::getAndClear(),
-		]);
-	}
-
-	private function isInertiaRequest(Request $request): bool
-	{
-		return $request->headers->get("X-Inertia") !== null;
 	}
 
 	public function getResponseType(): string
@@ -196,14 +153,11 @@ abstract class Operation
 		return $route;
 	}
 
-	public static function register(): void
+	public function registerRoutes(): void
 	{
-		$operationClass = get_called_class();
-
-		/** @var Operation $operation */
-		/** @phpstan-ignore-next-line */
-		$operation = new $operationClass();
-
-		Router::post($operation->route(), [$operationClass, "handleRequest"]);
+		Router::post(
+			$this->route(),
+			fn(Request $request) => $this->handleRequest($request)
+		);
 	}
 }
