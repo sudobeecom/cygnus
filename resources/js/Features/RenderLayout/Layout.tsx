@@ -1,5 +1,7 @@
+import { usePage } from "@inertiajs/inertia-react";
 import React, { useEffect } from "react";
 import { useTesting } from "../../hooks/useTesting";
+import { PagePropsType } from "../../Interfaces/PagePropsType";
 import { Notifications } from "../Notifications/Notifications";
 import { LayoutCommonInterface } from "./LayoutCommonInterface";
 
@@ -9,9 +11,11 @@ export const Layout: React.FC<LayoutCommonInterface> = ({
 }) => {
 	useTesting();
 
+	const { applicationName } = usePage<PagePropsType>().props;
+
 	useEffect(() => {
 		if (title !== null) {
-			document.title = `${title} - Lyra`;
+			document.title = `${title} - ${applicationName}`;
 		}
 	}, [title]);
 
