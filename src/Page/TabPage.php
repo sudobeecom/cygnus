@@ -39,13 +39,13 @@ abstract class TabPage extends Page
 	}
 
 	/**
-	 * @return array{
+	 * @return array<int, array{
 	 *     title: string,
 	 *     count: int|null,
 	 *     icon: string|null,
 	 *     link: string,
 	 *     active: bool
-	 * }[]
+	 * }>
 	 * @throws Exception
 	 */
 	protected function getTabs(): array

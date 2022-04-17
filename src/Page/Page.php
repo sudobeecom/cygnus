@@ -18,6 +18,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Route as Router;
 use Inertia\Inertia;
 use Inertia\Response;
+use SudoBee\Cygnus\Responses\StructuredPageResponse;
 
 abstract class Page extends Controller
 {
@@ -85,8 +86,13 @@ abstract class Page extends Controller
 	}
 
 	/**
-	 * @todo Change mixed to DTO
-	 * @return array<string, mixed>[]
+	 * @return array<int, array{
+	 *     title: string,
+	 *     count: int|null,
+	 *     icon: string|null,
+	 *     link: string,
+	 *     active: bool
+	 * }>
 	 */
 	protected function getTabs(): array
 	{
@@ -102,16 +108,13 @@ abstract class Page extends Controller
 	{
 		// TODO: also handle all exceptions gracefully, like done in Operation class
 
-		return Inertia::render("StructuredPage", [
-			"layout" => $this->layout()->export(),
-			"layoutProperties" => [
-				"title" => __($this->getPageTitle()),
-				"navigation" => $this->navigation(),
-				"tabs" => $this->getTabs(),
-				"tabsDesign" => $this->getTabsDesign(),
-			],
-			"nodes" => ExportBuilder::exportArray($this->nodes()),
-		]);
+		return StructuredPageResponse::make()
+			->setTitle($this->getPageTitle())
+			->setLayout($this->layout())
+			->setTabs($this->getTabs())
+			->setTabsDesign($this->getTabsDesign())
+			->setNodes($this->nodes())
+			->export();
 	}
 
 	public function registerRoutes(): void
