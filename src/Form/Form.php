@@ -12,6 +12,7 @@ use SudoBee\Cygnus\Component\Traits\HasWithPanel;
 use SudoBee\Cygnus\Core\Utilities\ExportBuilder;
 use SudoBee\Cygnus\Form\Actions\GetNestedFieldsDefaultValuesAction;
 use SudoBee\Cygnus\Form\Actions\GetNestedFieldsValidationRulesAction;
+use SudoBee\Cygnus\Form\Enums\OperationResponseType;
 use SudoBee\Cygnus\Form\Form\FormButton;
 use Exception;
 
@@ -29,7 +30,9 @@ class Form extends Component
 	/** @var array<string, mixed> $values */
 	private array $values = [];
 
-	private Operation $operation;
+	private ?Operation $operation = null;
+
+	private string $actionLink;
 
 	/**
 	 * @var FormButton[] $leftButtons
@@ -48,17 +51,22 @@ class Form extends Component
 	 */
 	private array $stickyHeader = [];
 
-	private function __construct(Operation $operation)
+	private function __construct(Operation|string $operationOrActionLink)
 	{
-		$this->operation = $operation;
+		if ($operationOrActionLink instanceof Operation) {
+			$this->operation = $operationOrActionLink;
+			$this->actionLink = $this->operation->route();
+		} else {
+			$this->actionLink = $operationOrActionLink;
+		}
 
 		$this->defaultSubmitButton = FormButton::make()->setTitle("Submit");
 		$this->setRightButtons([$this->defaultSubmitButton]);
 	}
 
-	public static function make(Operation $operation): self
+	public static function make(Operation|string $operationOrLink): self
 	{
-		return new self($operation);
+		return new self($operationOrLink);
 	}
 
 	public function setSubmitButtonText(string $submitButtonText): self
@@ -190,8 +198,9 @@ class Form extends Component
 	 */
 	public function export(): array
 	{
-		$action = $this->operation->resolveRoute();
-		$actionResponseType = $this->operation->getResponseType();
+		$actionResponseType =
+			$this->operation?->getResponseType() ??
+			OperationResponseType::REGULAR;
 
 		return ExportBuilder::make($this)
 			->mergeProperties($this->titleExport())
@@ -202,7 +211,7 @@ class Form extends Component
 			->addNodesProperty("leftButtons", $this->leftButtons)
 			->addNodesProperty("rightButtons", $this->rightButtons)
 			->addNodesProperty("stickyHeader", $this->stickyHeader)
-			->addProperty("action", $action)
+			->addProperty("action", $this->actionLink)
 			->addProperty("actionResponseType", $actionResponseType)
 			->addProperty("values", $this->getValues())
 			->export();
