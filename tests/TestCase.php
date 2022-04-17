@@ -2,28 +2,35 @@
 
 namespace SudoBee\Cygnus\Tests;
 
+use Orchestra\Testbench\TestCase as Orchestra;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
+use SudoBee\Cygnus\CygnusServiceProvider;
 use SudoBee\Cygnus\Page\Page;
 use Database\Seeders\DatabaseSeeder;
 use Domain\Integration\Models\Integration;
 use Domain\Shop\Actions\CreateShopAction;
 use Domain\Shop\Models\Shop;
 use Domain\Team\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Route;
 use ReflectionClass;
 use ReflectionException;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends Orchestra
 {
-	use RefreshDatabase;
-	use CreatesApplication;
+	protected $loadEnvironmentVariables = true;
 
 	protected function setUp(): void
 	{
 		parent::setUp();
+	}
 
-		$this->seed(DatabaseSeeder::class);
+	/**
+	 * @param $app
+	 * @return array<int, class-string<PackageServiceProvider>>
+	 */
+	protected function getPackageProviders($app): array
+	{
+		return [CygnusServiceProvider::class];
 	}
 
 	/**
@@ -41,24 +48,12 @@ abstract class TestCase extends BaseTestCase
 		return $reflection->getValue($object);
 	}
 
-	public function withUser()
+	public function withUser(): void
 	{
 		$this->actingAs(User::factory()->create());
 	}
 
-	public function withShop()
-	{
-		/** @var Shop $shop */
-		$shop = app(CreateShopAction::class)->execute(
-			"Fake shop",
-			"http://fake-shop.test",
-			Integration::whereActive(true)->first()
-		);
-
-		$shop->update(["secret" => "TEST_132"]);
-	}
-
-	public function getPageProps(Page $page)
+	public function getPageProps(Page $page): mixed
 	{
 		return $page
 			->handleRequest()
