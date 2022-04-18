@@ -6,6 +6,7 @@ use SudoBee\Cygnus\Component\Component;
 use SudoBee\Cygnus\Core\Traits\HasRegisterRoutes;
 use SudoBee\Cygnus\Core\Traits\HasResolveHelpers;
 use SudoBee\Cygnus\Core\Utilities\ExportBuilder;
+use SudoBee\Cygnus\Core\Utilities\RouteUtility;
 use SudoBee\Cygnus\Form\Operation;
 use SudoBee\Cygnus\Layout\Layout;
 use SudoBee\Cygnus\Layout\Layouts\TopSideLayout;
@@ -15,8 +16,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Route as Router;
-use Inertia\Inertia;
 use Inertia\Response;
 use SudoBee\Cygnus\Responses\StructuredPageResponse;
 
@@ -106,8 +105,6 @@ abstract class Page extends Controller
 
 	public function handleRequest(): Response
 	{
-		// TODO: also handle all exceptions gracefully, like done in Operation class
-
 		return StructuredPageResponse::make()
 			->setTitle($this->getPageTitle())
 			->setLayout($this->layout())
@@ -127,7 +124,10 @@ abstract class Page extends Controller
 		}
 
 		$routeName = $this->routeName();
-		$route = Router::get($this->route(), fn() => $this->handleRequest());
+		$route = RouteUtility::get(
+			$this->route(),
+			fn() => $this->handleRequest()
+		);
 		if ($routeName !== null) {
 			$route->name($routeName);
 		}

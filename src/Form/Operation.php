@@ -5,13 +5,12 @@ namespace SudoBee\Cygnus\Form;
 use SudoBee\Cygnus\Core\Traits\HasRegisterRoutes;
 use SudoBee\Cygnus\Core\Traits\HasResolveHelpers;
 use SudoBee\Cygnus\Core\Utilities\Notification;
-use SudoBee\Cygnus\Form\Actions\HandleExceptionGracefullyAction;
+use SudoBee\Cygnus\Core\Utilities\RouteUtility;
 use SudoBee\Cygnus\Form\Actions\IsInertiaRequestAction;
 use SudoBee\Cygnus\Form\Enums\OperationResponseType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route as Router;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -75,53 +74,47 @@ abstract class Operation
 	/**
 	 * @param Request $request
 	 * @return JsonResponse|RedirectResponse
+	 * @throws Throwable
 	 * @throws ValidationException
 	 */
 	public function handleRequest(
 		Request $request
 	): JsonResponse|RedirectResponse {
-		try {
-			$this->updateStore();
+		$this->updateStore();
 
-			$isInertiaRequest = app(IsInertiaRequestAction::class)->execute(
-				$request
-			);
+		$isInertiaRequest = app(IsInertiaRequestAction::class)->execute(
+			$request
+		);
 
-			if (!$this->authorize()) {
-				Notification::danger("You do not have permission for that.");
-
-				if ($isInertiaRequest) {
-					return redirect()->back();
-				}
-
-				return response()->json([
-					"success" => false,
-					"data" => null,
-					"errors" => [],
-					"notification" => Notification::getAndClear(),
-				]);
-			}
-
-			$validated = $this->validate($request);
-
-			$response = $this->callHandle((object) $validated);
+		if (!$this->authorize()) {
+			Notification::danger("You do not have permission for that.");
 
 			if ($isInertiaRequest) {
-				return $response;
+				return redirect()->back();
 			}
 
 			return response()->json([
-				"success" => true,
-				"data" => $response,
-				"errors" => null,
+				"success" => false,
+				"data" => null,
+				"errors" => [],
 				"notification" => Notification::getAndClear(),
 			]);
-		} catch (Throwable $throwable) {
-			return app(HandleExceptionGracefullyAction::class)->execute(
-				$request,
-				$throwable
-			);
 		}
+
+		$validated = $this->validate($request);
+
+		$response = $this->callHandle((object) $validated);
+
+		if ($isInertiaRequest) {
+			return $response;
+		}
+
+		return response()->json([
+			"success" => true,
+			"data" => $response,
+			"errors" => null,
+			"notification" => Notification::getAndClear(),
+		]);
 	}
 
 	public function getResponseType(): string
@@ -155,7 +148,7 @@ abstract class Operation
 
 	public function registerRoutes(): void
 	{
-		Router::post(
+		RouteUtility::post(
 			$this->route(),
 			fn(Request $request) => $this->handleRequest($request)
 		);

@@ -4,7 +4,6 @@ namespace SudoBee\Cygnus\Form\Actions;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use SudoBee\Cygnus\Core\Utilities\Notification;
 use Throwable;
@@ -14,12 +13,12 @@ class HandleExceptionGracefullyAction
 	/**
 	 * @throws Throwable
 	 */
-	public function execute(
-		Request $request,
-		Throwable $throwable
-	): JsonResponse|RedirectResponse {
+	public function execute(Throwable $throwable): JsonResponse|RedirectResponse
+	{
+		// TODO: instead of checking if its inertia request,
+		//       check if request wants json (header "Accept")
 		$isInertiaRequest = app(IsInertiaRequestAction::class)->execute(
-			$request
+			request()
 		);
 
 		if ($throwable instanceof ValidationException) {
@@ -40,6 +39,10 @@ class HandleExceptionGracefullyAction
 				),
 				"notification" => Notification::getAndClear(),
 			]);
+		}
+
+		if (app()->isLocal()) {
+			throw $throwable;
 		}
 
 		report($throwable);
