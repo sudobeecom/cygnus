@@ -12,13 +12,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Response;
+use LogicException;
 use SudoBee\Cygnus\Core\Traits\HasRegisterRoutes;
 use SudoBee\Cygnus\Core\Traits\HasResolveHelpers;
 use SudoBee\Cygnus\Core\Utilities\Notification;
 use SudoBee\Cygnus\Core\Utilities\RouteUtility;
 use SudoBee\Cygnus\Core\Utilities\Translate;
+use SudoBee\Cygnus\Form\Fields\Field;
 use SudoBee\Cygnus\Resource\Actions\HandleResourceRouteIndexAction;
-use SudoBee\Cygnus\Resource\Utilities\ResourceFormFactory;
+use SudoBee\Cygnus\Resource\Enums\ResourcePageType;
+use SudoBee\Cygnus\Resource\Traits\HasResourceFields;
+use SudoBee\Cygnus\Resource\Factories\ResourceFormFactory;
 use SudoBee\Cygnus\Form\Form;
 use SudoBee\Cygnus\Form\Traits\HasCanHaveStore;
 use SudoBee\Cygnus\Responses\StructuredPageResponse;
@@ -28,28 +32,30 @@ use SudoBee\Cygnus\Responses\StructuredPageResponse;
  */
 abstract class Resource
 {
-	use HasRegisterRoutes;
-	use HasCanHaveStore;
-	use HasResolveHelpers;
+	use HasRegisterRoutes, HasCanHaveStore, HasResolveHelpers;
+	use HasResourceFields;
 
-	/** @var class-string<TModelClass> $modelClass */
-	private string $modelClass;
+	/** @var class-string<TModelClass> $model */
+	protected string $model;
 
 	/** @var Builder<TModelClass>|BelongsTo<Model, TModelClass>|HasMany<TModelClass> $query */
 	private Builder|BelongsTo|HasMany $query;
 
-	/** @var TModelClass $model */
-	private Model $model;
+	/** @var TModelClass $modelInstance */
+	private Model $modelInstance;
 
 	private function __construct()
 	{
 		$this->bootHasCanHaveStore();
-	}
 
-	/**
-	 * @return class-string<TModelClass>
-	 */
-	abstract protected function model(): string;
+		if (!isset($this->model)) {
+			throw new LogicException(
+				"Property \$model must be defined in " .
+					get_called_class() .
+					" class."
+			);
+		}
+	}
 
 	/**
 	 * @param Builder<TModelClass> $query
@@ -62,33 +68,21 @@ abstract class Resource
 
 	protected function getRouteKeyName(): string
 	{
-		return $this->getModel()->getRouteKeyName();
-	}
-
-	/**
-	 * @return class-string<TModelClass>
-	 */
-	private function getModelClass(): string
-	{
-		if (!isset($this->modelClass)) {
-			$this->modelClass = $this->model();
-		}
-
-		return $this->modelClass;
+		return $this->getModelInstance()->getRouteKeyName();
 	}
 
 	/**
 	 * @return TModelClass
 	 */
-	private function getModel(): Model
+	private function getModelInstance(): Model
 	{
-		if (!isset($this->model)) {
-			$modelClass = $this->getModelClass();
+		if (!isset($this->modelInstance)) {
+			$model = $this->model;
 
-			$this->model = new $modelClass();
+			$this->modelInstance = new $model();
 		}
 
-		return $this->model;
+		return $this->modelInstance;
 	}
 
 	/**
@@ -97,7 +91,7 @@ abstract class Resource
 	private function getQuery(): Builder|BelongsTo|HasMany
 	{
 		if (!isset($this->query)) {
-			$rawQuery = $this->model()::query();
+			$rawQuery = $this->model::query();
 
 			$this->query = $this->query($rawQuery);
 		}
@@ -156,7 +150,13 @@ abstract class Resource
 		return app(HandleResourceRouteIndexAction::class)->execute(
 			response: $this->buildResponse(),
 			query: $this->getQuery(),
-			model: $this->getModel(),
+			columns: $this->getFieldsFor(ResourcePageType::INDEX)
+				->mapWithKeys(
+					fn(Field $field) => [
+						$field->getName() => $field->getLabel(),
+					]
+				)
+				->all(),
 			modelHeadline: $this->getModelHeadline(),
 			routeCreateLink: $this->createRouteLink("/create"),
 			routeEditLink: $this->createRouteLink("/{model}/edit"),
@@ -249,8 +249,8 @@ abstract class Resource
 		$this->updateStore();
 
 		return ResourceFormFactory::make(
-			model: $this->getModel(),
 			entity: null,
+			fields: $this->getFieldsFor(ResourcePageType::CREATE),
 			actionLink: $this->createRouteLink("/create"),
 			modelHeadline: $this->getModelHeadline()
 		);
@@ -266,8 +266,8 @@ abstract class Resource
 		$entity = $this->resolveEntity();
 
 		return ResourceFormFactory::make(
-			model: $this->getModel(),
 			entity: $entity,
+			fields: $this->getFieldsFor(ResourcePageType::EDIT),
 			actionLink: $this->createRouteLink(
 				"/" . $entity->{$this->getRouteKeyName()} . "/update"
 			),
@@ -278,7 +278,7 @@ abstract class Resource
 	private function resolveEntity(): Model
 	{
 		return $this->resolve(
-			class: get_class($this->getModel()),
+			class: $this->model,
 			query: $this->getQuery(),
 			modelRouteKeyName: $this->getRouteKeyName()
 		);
@@ -311,7 +311,7 @@ abstract class Resource
 
 	private function getModelBasename(): string
 	{
-		return Str::of($this->getModelClass())->classBasename();
+		return Str::of($this->model)->classBasename();
 	}
 
 	private function getModelHeadline(): string

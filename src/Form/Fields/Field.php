@@ -2,22 +2,23 @@
 
 namespace SudoBee\Cygnus\Form\Fields;
 
+use Exception;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use SudoBee\Cygnus\Component\Component;
 use SudoBee\Cygnus\Component\Components\Text;
 use SudoBee\Cygnus\Component\Rules\DeepEqualRule;
 use SudoBee\Cygnus\Component\Traits\HasDisabled;
+use SudoBee\Cygnus\ResourceFieldConfiguration\Traits\HasResourceConfigurations;
 use SudoBee\Cygnus\Core\Utilities\ExportBuilder;
 use SudoBee\Cygnus\Form\Fields\Classes\Dependee;
-use Exception;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 /**
  * @template TDefaultValue
  */
 abstract class Field extends Component
 {
-	use HasDisabled;
+	use HasDisabled, HasResourceConfigurations;
 
 	private string $name;
 
@@ -27,17 +28,13 @@ abstract class Field extends Component
 
 	private ?string $explanation = null;
 
-	/**
-	 * @var mixed $defaultValue
-	 */
+	/** @var mixed $defaultValue */
 	private mixed $defaultValue = null;
 
 	/** @var Collection<int, mixed> */
 	private Collection $validationRules;
 
-	/**
-	 * @var Collection<int, Dependee> $dependees
-	 */
+	/** @var Collection<int, Dependee> $dependees */
 	private Collection $dependees;
 
 	/**
@@ -50,6 +47,8 @@ abstract class Field extends Component
 				"When component Text is used for field label, the name must be provided."
 			);
 		}
+
+		$this->bootHasResourceConfigurations();
 
 		$this->label = $label;
 
@@ -151,12 +150,14 @@ abstract class Field extends Component
 	 */
 	public function getValidationRules(object $formValues): array
 	{
-		$fieldValue = $formValues->{$this->name} ?? null;
+		$fieldValue = $formValues->{$this->name} ?? $this->defaultValue;
 
-		// We allow only default value to be submitted
-		// when field is disabled
+		/**
+		 * We allow only default value to be submitted
+		 * when field is disabled
+		 */
 		$fieldRules = $this->disabled
-			? [new DeepEqualRule($fieldValue ?? $this->defaultValue)]
+			? [new DeepEqualRule($fieldValue)]
 			: $this->validationRules->all();
 
 		$activeDependeesValidationsRules = $this->getActiveDependees(
@@ -173,6 +174,11 @@ abstract class Field extends Component
 			[$this->name => $fieldRules],
 			$activeDependeesValidationsRules
 		);
+	}
+
+	public function getLabel(): string|Text
+	{
+		return $this->label;
 	}
 
 	public function getName(): string
@@ -240,7 +246,7 @@ abstract class Field extends Component
 	}
 
 	/**
-	 * @return array<mixed>
+	 * @return array<string, mixed>
 	 */
 	protected function fieldExport(): array
 	{

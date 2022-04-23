@@ -15,9 +15,7 @@ class Text extends Component
 
 	private function __construct(string|Component|null ...$nodes)
 	{
-		/**
-		 * @var array<int, string|Component>
-		 */
+		/** @var array<int, string|Component> $nodesWithoutNull */
 		$nodesWithoutNull = array_filter($nodes, fn($node) => $node !== null);
 
 		$this->nodesAndStrings = $nodesWithoutNull;
@@ -52,7 +50,7 @@ class Text extends Component
 			array_map(
 				/**
 				 * @param string|Component $nodeOrString
-				 * @return array<mixed>|string
+				 * @return array<int, mixed>|string
 				 */
 				function (string|Component $nodeOrString) {
 					if ($nodeOrString instanceof Exportable) {

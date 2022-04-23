@@ -8,8 +8,8 @@ use SudoBee\Cygnus\Form\Fields\Field;
 class GetNestedFieldsAction
 {
 	/**
-	 * @param Component[] $nodes
-	 * @return Field<mixed>[]
+	 * @param array<int, Component> $nodes
+	 * @return array<int, Field<mixed>>
 	 */
 	public function execute(array $nodes): array
 	{
@@ -17,8 +17,8 @@ class GetNestedFieldsAction
 	}
 
 	/**
-	 * @param Component[]|null $nodes
-	 * @return Field<mixed>[]
+	 * @param array<int, Component>|null $nodes
+	 * @return array<int, Field<mixed>>
 	 */
 	private function getFields(array $nodes = null): array
 	{

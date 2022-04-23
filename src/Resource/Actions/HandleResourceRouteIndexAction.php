@@ -10,11 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use Inertia\Response;
+use SudoBee\Cygnus\Component\Component;
 use SudoBee\Cygnus\Component\Components\Button\Button;
 use SudoBee\Cygnus\Component\Components\Link\Link;
 use SudoBee\Cygnus\Component\Components\PaginatedTable\PaginatedTable;
 use SudoBee\Cygnus\Component\Components\Table\Cells\TableLinks;
 use SudoBee\Cygnus\Component\Components\Table\TableRow;
+use SudoBee\Cygnus\Component\Components\Text;
 use SudoBee\Cygnus\Component\Enums\Icon;
 use SudoBee\Cygnus\Core\Utilities\Translate;
 use SudoBee\Cygnus\Responses\StructuredPageResponse;
@@ -24,7 +26,7 @@ class HandleResourceRouteIndexAction
 	/**
 	 * @param StructuredPageResponse $response
 	 * @param Builder<Model>|BelongsTo<Model, Model>|HasMany<Model> $query
-	 * @param Model $model
+	 * @param array<string, string|Text> $columns
 	 * @param string $modelHeadline
 	 * @param string $routeCreateLink
 	 * @param string $routeEditLink
@@ -36,15 +38,13 @@ class HandleResourceRouteIndexAction
 	public function execute(
 		StructuredPageResponse $response,
 		Builder|Relation|HasMany $query,
-		Model $model,
+		array $columns,
 		string $modelHeadline,
 		string $routeCreateLink,
 		string $routeEditLink,
 		string $routeDeleteLink,
 		?string $modelRouteKeyName
 	): Response {
-		$columnKeys = collect($model->getFillable())->diff($model->getHidden());
-
 		$paginatedTable = PaginatedTable::make()
 			->setTitle(Str::of($modelHeadline)->plural())
 			->setPanelActions([
@@ -59,20 +59,21 @@ class HandleResourceRouteIndexAction
 			])
 			->setQuery($query->orderByDesc("created_at"))
 			->setRow(function (Model $model) use (
-				$columnKeys,
+				$columns,
 				$routeEditLink,
 				$routeDeleteLink,
 				$modelRouteKeyName
 			) {
 				$tableRow = TableRow::make($model->{$model->getKeyName()});
 
-				$values = collect($columnKeys)->map(function (
-					string $columnKey
-				) use ($model) {
-					$value = $model->{$columnKey};
-
-					return $value === null ? "–" : $value;
-				});
+				$values = collect($columns)
+					->keys()
+					->map(
+						// TODO: allow developer to write his own custom parsers for each field
+						fn(string $key) => $this->parseValueForDisplay(
+							$model->{$key}
+						)
+					);
 
 				$routeKeyValue = $model->{$modelRouteKeyName};
 
@@ -100,17 +101,30 @@ class HandleResourceRouteIndexAction
 				]);
 			});
 
-		collect($columnKeys)->each(
-			fn(string $columnKey) => $paginatedTable->addColumn(
-				Str::of($columnKey)
-					->headline()
-					->lower()
-					->ucfirst()
+		collect($columns)->each(
+			fn(string|Text $name, string $key) => $paginatedTable->addColumn(
+				$name instanceof Text
+					? Str::of($key)
+						->headline()
+						->lower()
+						->ucfirst()
+					: $name,
+				$key
 			)
 		);
 
 		$paginatedTable->addLinksColumn();
 
 		return $response->setNodes([$paginatedTable])->export();
+	}
+
+	private function parseValueForDisplay(
+		string|int|float|bool|null $value
+	): string {
+		if (is_bool($value)) {
+			return $value ? Translate::text("Yes") : Translate::text("No");
+		}
+
+		return (string) $value;
 	}
 }
