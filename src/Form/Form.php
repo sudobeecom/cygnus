@@ -34,21 +34,15 @@ class Form extends Component
 
 	private string $actionLink;
 
-	/**
-	 * @var FormButton[] $leftButtons
-	 */
+	/** @var array<int, FormButton> $leftButtons */
 	private array $leftButtons = [];
 
-	/**
-	 * @var FormButton[] $rightButtons
-	 */
+	/** @var array<int, FormButton> $rightButtons */
 	private array $rightButtons = [];
 
 	private FormButton $defaultSubmitButton;
 
-	/**
-	 * @var Component[]
-	 */
+	/** @var array<int, Component> */
 	private array $stickyHeader = [];
 
 	private function __construct(Operation|string $operationOrActionLink)
