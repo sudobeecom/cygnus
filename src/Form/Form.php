@@ -45,11 +45,14 @@ class Form extends Component
 	/** @var array<int, Component> */
 	private array $stickyHeader = [];
 
+	/**
+	 * @throws Exception
+	 */
 	private function __construct(Operation|string $operationOrActionLink)
 	{
 		if ($operationOrActionLink instanceof Operation) {
 			$this->operation = $operationOrActionLink;
-			$this->actionLink = $this->operation->route();
+			$this->actionLink = $this->operation->resolveRoute();
 		} else {
 			$this->actionLink = $operationOrActionLink;
 		}
