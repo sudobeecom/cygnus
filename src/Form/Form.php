@@ -7,6 +7,7 @@ use SudoBee\Cygnus\Component\Components\Table\Actions\GetTableSelectedValuesVali
 use SudoBee\Cygnus\Component\Traits\HasActions;
 use SudoBee\Cygnus\Component\Traits\HasDescription;
 use SudoBee\Cygnus\Component\Traits\HasNodes;
+use SudoBee\Cygnus\Component\Traits\HasPreserveScroll;
 use SudoBee\Cygnus\Component\Traits\HasTitle;
 use SudoBee\Cygnus\Component\Traits\HasWithPanel;
 use SudoBee\Cygnus\Core\Utilities\ExportBuilder;
@@ -22,6 +23,7 @@ class Form extends Component
 	use HasDescription;
 	use HasActions;
 	use HasNodes;
+	use HasPreserveScroll;
 	use HasWithPanel;
 
 	/** @var array<string, mixed> $additionalValidationRules */
@@ -204,6 +206,7 @@ class Form extends Component
 			->mergeProperties($this->descriptionExport())
 			->mergeProperties($this->actionsExport())
 			->mergeProperties($this->nodesExport())
+			->mergeProperties($this->preserveScrollExport())
 			->mergeProperties($this->withPanelExport())
 			->addNodesProperty("leftButtons", $this->leftButtons)
 			->addNodesProperty("rightButtons", $this->rightButtons)

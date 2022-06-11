@@ -35,6 +35,7 @@ export interface FormInterface {
 	rightButtons: FormButtonInterface[];
 	stickyHeader: NodeType[];
 	nodes: NodeType[];
+	preserveScroll: boolean;
 	withPanel: boolean;
 	setLoading?: (loading: boolean) => void;
 	onSuccess?: <T>(response: ResponseSuccessType<T> | null) => Promise<void>;
@@ -88,6 +89,7 @@ const InternalForm: React.FC<InternalFormInterface> = ({
 	rightButtons,
 	stickyHeader,
 	nodes,
+	preserveScroll,
 	withPanel,
 	setLoading: givenSetLoading,
 	onSuccess,
@@ -136,6 +138,7 @@ const InternalForm: React.FC<InternalFormInterface> = ({
 		if (actionResponseType === "REGULAR") {
 			setLoading(true);
 			Inertia.post(action, submitData, {
+				preserveScroll,
 				onSuccess(page) {
 					const props = page.props as PagePropsInterface;
 					if (props.resetFormIdentifier === formIdentifier) {
