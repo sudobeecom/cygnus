@@ -24,7 +24,7 @@ class UserFormFactory
 				"password"
 			)
 				->presetPassword()
-				->setOptional(),
+				->setOptional($user !== null),
 		];
 	}
 }
