@@ -47,6 +47,13 @@ import { AlertBanner } from "./Nodes/AlertBanner";
 import { TextareaField } from "./Nodes/Form/Fields/TextareaField";
 
 export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
+	/**
+	 * Temporary extension for components
+	 */
+	const customComponents: { nodeType: string; [key: string]: any } = (
+		window as any
+	).cygnusCustomComponents;
+
 	// eslint-disable-next-line
 	const Component: React.FC<any> = {
 		Grid,
@@ -94,6 +101,7 @@ export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
 		Chart,
 		ShopConnectionPanel,
 		AlertBanner,
+		...customComponents,
 	}[nodeType];
 
 	if (Component) {
