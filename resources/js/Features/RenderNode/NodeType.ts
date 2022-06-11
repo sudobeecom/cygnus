@@ -42,6 +42,7 @@ import { BalanceInformationInterface } from "./Nodes/BalanceInformation";
 import { ChartInterface } from "./Nodes/Chart/Chart";
 import { ShopConnectionPanelInterface } from "../ShopConnectionPanel";
 import { AlertBannerInterface } from "./Nodes/AlertBanner";
+import { TextareaFieldInterface } from "./Nodes/Form/Fields/TextareaField";
 
 export type NodeType =
 	| GridInterface
@@ -77,6 +78,7 @@ export type NodeType =
 	| ModalInterface
 	| AlertInterface
 	| TextFieldInterface
+	| TextareaFieldInterface
 	| NumberFieldInterface
 	| SelectFieldInterface
 	| FileFieldInterface

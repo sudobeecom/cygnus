@@ -44,6 +44,7 @@ import { BalanceInformation } from "./Nodes/BalanceInformation";
 import { Chart } from "./Nodes/Chart/Chart";
 import { ShopConnectionPanel } from "../ShopConnectionPanel";
 import { AlertBanner } from "./Nodes/AlertBanner";
+import { TextareaField } from "./Nodes/Form/Fields/TextareaField";
 
 export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
 	// eslint-disable-next-line
@@ -77,6 +78,7 @@ export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
 		Modal,
 		Alert,
 		TextField,
+		TextareaField,
 		NumberField,
 		SelectField,
 		HasManyField,
