@@ -180,7 +180,7 @@ class Form extends Component
 	{
 		$defaultValues = app(
 			GetNestedFieldsDefaultValuesAction::class
-		)->execute($this->getNodes());
+		)->execute($this->getNodes(), (object) $this->values);
 
 		$valuesWithoutNull = collect($this->values)
 			->filter(fn(mixed $value) => $value !== null)

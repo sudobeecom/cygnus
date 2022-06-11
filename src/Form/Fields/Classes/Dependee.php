@@ -39,7 +39,8 @@ class Dependee implements Exportable
 	public function getFieldsDefaultValues(): array
 	{
 		return app(GetNestedFieldsDefaultValuesAction::class)->execute(
-			$this->getNodes()
+			$this->getNodes(),
+			(object) [] // TODO: rework form default values and dependers. for now by passing [], we will not support nested dependers
 		);
 	}
 

@@ -187,12 +187,16 @@ abstract class Field extends Component
 	}
 
 	/**
+	 * @param object $formValues
 	 * @return array<string, mixed>
 	 */
-	public function getDefaultValue(): array
+	public function getDefaultValue(object $formValues): array
 	{
+		//		dump($this->name, $this->defaultValue);
+		$defaultValue = $formValues->{$this->name} ?? $this->defaultValue;
+
 		$activeDependeesDefaultValues = $this->getActiveDependees(
-			$this->defaultValue
+			$defaultValue
 		)->reduce(
 			fn(array $previous, Dependee $dependee) => array_merge(
 				$previous,

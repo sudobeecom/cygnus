@@ -175,7 +175,8 @@ class HasManyField extends Field
 	private function getTemplateDefaultValue(): array
 	{
 		return app(GetNestedFieldsDefaultValuesAction::class)->execute(
-			$this->template
+			$this->template,
+			(object) [] // TODO: rework form default values and dependers. for now by passing [], dependers in has-many might not work properly
 		);
 	}
 
