@@ -26,7 +26,7 @@ export const CentralLayout: React.FC<CentralLayoutInterface> = ({
 				{(showLogo || title !== null || subtitle !== null) && (
 					<div>
 						{showLogo && (
-							<Logo className="mx-auto mb-6 h-16 w-16" />
+							<Logo className="mx-auto mb-6 h-16 w-16 text-primary-800" />
 						)}
 
 						{title !== null && (

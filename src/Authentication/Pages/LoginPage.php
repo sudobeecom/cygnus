@@ -31,18 +31,20 @@ class LoginPage extends Page
 
 	public function layout(): Layout
 	{
-		if (!Route::has(Linker::toPage(RegisterPage::class))) {
-			return CentralLayout::make();
+		$layout = CentralLayout::make()->setTitle($this->title());
+
+		if (config("cygnus.enable_registration")) {
+			$layout->setSubtitle(
+				Text::make(
+					"Or ",
+					Link::make()
+						->setTitle("create new account")
+						->toPage(RegisterPage::class)
+				)
+			);
 		}
 
-		return CentralLayout::make()->setSubtitle(
-			Text::make(
-				"Or ",
-				Link::make()
-					->setTitle("create new account")
-					->toPage(RegisterPage::class)
-			)
-		);
+		return $layout;
 	}
 
 	public function nodes(): array

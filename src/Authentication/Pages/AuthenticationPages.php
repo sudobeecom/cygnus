@@ -8,15 +8,25 @@ use SudoBee\Cygnus\Authentication\Operations\LogoutOperation;
 
 class AuthenticationPages
 {
-	// TODO: add $enablePasswordReset?
-	public static function register(bool $enableRegistration = false): void
+	public static function register(): void
 	{
-		LoginPage::register();
-		LogoutOperation::register();
+		Route::middleware(config("cygnus.guest_middlewares"))->group(
+			function () {
+				LoginPage::register();
 
-		if ($enableRegistration) {
-			RegisterPage::register();
-		}
+				if (config("cygnus.enable_registration")) {
+					RegisterPage::register();
+				}
+
+				if (config("cygnus.enable_reset_password")) {
+					ForgotPasswordPage::register();
+					ForgotPasswordEmailSentPage::register();
+					ResetPasswordPage::register();
+				}
+			}
+		);
+
+		LogoutOperation::register();
 
 		Route::get("/", fn() => redirect(RouteServiceProvider::getHomepage()));
 	}

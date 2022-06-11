@@ -40,9 +40,12 @@ class ForgotPasswordForm extends ProcessableForm
 		$isRateLimitReached = RateLimiter::tooManyAttempts($throttleKey, 1);
 		if ($isRateLimitReached) {
 			Notification::danger(
-				trans("auth.throttle", [
-					"seconds" => RateLimiter::availableIn($throttleKey),
-				])
+				trans(
+					"Too many password recovery attempts. Please try again in :seconds seconds.",
+					[
+						"seconds" => RateLimiter::availableIn($throttleKey),
+					]
+				)
 			);
 
 			return redirect()->back();

@@ -34,10 +34,11 @@ class LoginForm extends ProcessableForm
 				->setJustify(Justify::BETWEEN)
 				->setNodes([
 					CheckboxField::make("Remember me"),
-					Link::make()
+					...Link::make()
 						->setTitle("Forgot your password?")
 						->setTextAlign(Align::RIGHT)
-						->toPage(ForgotPasswordPage::class),
+						->toPage(ForgotPasswordPage::class)
+						->show(config("cygnus.enable_reset_password")),
 				]),
 			FormButton::make()->setTitle("Login"),
 		]);

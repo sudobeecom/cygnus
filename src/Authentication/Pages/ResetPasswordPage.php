@@ -3,7 +3,9 @@
 namespace SudoBee\Cygnus\Authentication\Pages;
 
 use SudoBee\Cygnus\Authentication\Forms\ResetPasswordForm;
+use SudoBee\Cygnus\Component\Components\Panel;
 use SudoBee\Cygnus\Layout\Layout;
+use SudoBee\Cygnus\Layout\Layouts\CentralLayout;
 use SudoBee\Cygnus\Layout\Layouts\UnauthorizedLayout\UnauthorizedLayout;
 use SudoBee\Cygnus\Page\Page;
 
@@ -30,12 +32,16 @@ class ResetPasswordPage extends Page
 
 	public function layout(): Layout
 	{
-		return UnauthorizedLayout::make();
+		return CentralLayout::make()->setTitle($this->title());
 	}
 
 	public function nodes(): array
 	{
-		return [ResetPasswordForm::make()];
+		return [
+			Panel::make()
+				->setPadding(10)
+				->setNodes([ResetPasswordForm::make()]),
+		];
 	}
 
 	public function operations(): array

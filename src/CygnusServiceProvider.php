@@ -9,6 +9,9 @@ class CygnusServiceProvider extends PackageServiceProvider
 {
 	public function configurePackage(Package $package): void
 	{
-		$package->name("cygnus")->hasAssets();
+		$package
+			->name("cygnus")
+			->hasConfigFile()
+			->hasAssets();
 	}
 }

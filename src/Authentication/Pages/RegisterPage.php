@@ -23,9 +23,9 @@ class RegisterPage extends Page
 
 	public function layout(): Layout
 	{
-		return CentralLayout::make()->setSubtitle(
-			SubtitleWithLoginPageLink::make()
-		);
+		return CentralLayout::make()
+			->setTitle($this->title())
+			->setSubtitle(SubtitleWithLoginPageLink::make());
 	}
 
 	public function nodes(): array
