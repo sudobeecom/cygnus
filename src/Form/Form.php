@@ -184,11 +184,23 @@ class Form extends Component
 			GetNestedFieldsDefaultValuesAction::class
 		)->execute($this->getNodes(), (object) $this->values);
 
+		$valuesWithOnlyNulls = collect($this->values)
+			->filter(fn(mixed $value) => $value === null)
+			->all();
+
 		$valuesWithoutNull = collect($this->values)
 			->filter(fn(mixed $value) => $value !== null)
 			->all();
 
-		return array_merge($defaultValues, $valuesWithoutNull);
+		return array_merge(
+			/**
+			 * We merge other values on top on null values
+			 * in order to keep null values as well.
+			 */
+			$valuesWithOnlyNulls,
+			$defaultValues,
+			$valuesWithoutNull
+		);
 	}
 
 	/**
