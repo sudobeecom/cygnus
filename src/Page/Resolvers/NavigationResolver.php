@@ -6,19 +6,25 @@ use SudoBee\Cygnus\Page\Objects\NavigationItem;
 
 class NavigationResolver
 {
-	/** @var NavigationItem[] */
-	private array $navigationItems = [];
-
 	/**
-	 * @param NavigationItem[] $navigationItems
+	 * @param array<int, NavigationItem> $navigationItems
 	 */
-	public function __construct(array $navigationItems = [])
+	public function __construct(private readonly array $navigationItems = [])
 	{
-		$this->navigationItems = $navigationItems;
+		//
 	}
 
 	/**
-	 * @return NavigationItem[]
+	 * @param array<int, NavigationItem> $navigationItems
+	 * @return self
+	 */
+	public static function make(array $navigationItems = []): self
+	{
+		return new self($navigationItems);
+	}
+
+	/**
+	 * @return array<int, NavigationItem>
 	 */
 	public function getNavigationItems(): array
 	{

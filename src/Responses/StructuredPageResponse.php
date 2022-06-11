@@ -11,6 +11,7 @@ use SudoBee\Cygnus\Layout\Layout;
 use SudoBee\Cygnus\Layout\Layouts\TopSideLayout;
 use SudoBee\Cygnus\Page\Resolvers\LayoutResolver;
 use SudoBee\Cygnus\Page\Resolvers\NavigationResolver;
+use SudoBee\Cygnus\Page\Resolvers\UserNavigationResolver;
 
 class StructuredPageResponse
 {
@@ -102,6 +103,16 @@ class StructuredPageResponse
 		return ExportBuilder::exportArray($navigation->getNavigationItems());
 	}
 
+	/**
+	 * @return array<int, mixed>
+	 */
+	private function getUserNavigation(): array
+	{
+		$navigation = app(UserNavigationResolver::class);
+
+		return ExportBuilder::exportArray($navigation->getNavigationItems());
+	}
+
 	public function export(): Response
 	{
 		return Inertia::render("StructuredPage", [
@@ -109,6 +120,7 @@ class StructuredPageResponse
 			"layoutProperties" => [
 				"title" => __($this->title),
 				"navigation" => $this->getNavigation(),
+				"userNavigation" => $this->getUserNavigation(),
 				"tabs" => $this->tabs,
 				"tabsDesign" => $this->tabsDesign,
 			],

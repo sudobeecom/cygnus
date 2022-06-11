@@ -16,6 +16,7 @@ export interface LeftSideLayoutInterface extends LayoutCommonInterface {
 export const LeftSideLayout: React.FC<LeftSideLayoutInterface> = ({
 	title,
 	navigation,
+	userNavigation,
 	tabs,
 	tabsDesign: givenTabsDesign,
 	children,
@@ -129,7 +130,7 @@ export const LeftSideLayout: React.FC<LeftSideLayoutInterface> = ({
 
 							<div className="flex-1" />
 
-							<UserNavigation />
+							<UserNavigation items={userNavigation} />
 						</div>
 
 						{tabsDesign === TabsMenuDesign.REGULAR && (

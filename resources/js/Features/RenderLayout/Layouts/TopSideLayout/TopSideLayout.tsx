@@ -12,6 +12,7 @@ export interface TopSideLayoutInterface extends LayoutCommonInterface {
 export const TopSideLayout: React.FC<TopSideLayoutInterface> = ({
 	title,
 	navigation,
+	userNavigation,
 	tabs,
 	tabsDesign,
 	children,
@@ -26,7 +27,7 @@ export const TopSideLayout: React.FC<TopSideLayoutInterface> = ({
 
 	return (
 		<>
-			<Navigation items={navigation} />
+			<Navigation items={navigation} userNavigation={userNavigation} />
 
 			<header className="bg-white pt-6 shadow">
 				<div

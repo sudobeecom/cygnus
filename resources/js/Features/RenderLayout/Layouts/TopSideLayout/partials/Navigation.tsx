@@ -8,7 +8,10 @@ import { AuthorizedPagePropsType } from "../../../../../Interfaces/AuthorizedPag
 import { Icon } from "../../../../Icon";
 import { Logo } from "../../../../Logo";
 import { NavigationItem } from "../../../../NavigationItem";
-import { UserNavigation } from "../../../Features/UserNavigation";
+import {
+	UserNavigation,
+	UserNavigationItemInterface,
+} from "../../../Features/UserNavigation";
 
 export interface NavigationItemInterface {
 	activeMatch: string;
@@ -19,9 +22,13 @@ export interface NavigationItemInterface {
 
 interface NavigationInterface {
 	items: NavigationItemInterface[];
+	userNavigation: UserNavigationItemInterface[];
 }
 
-export const Navigation: React.FC<NavigationInterface> = ({ items }) => {
+export const Navigation: React.FC<NavigationInterface> = ({
+	items,
+	userNavigation,
+}) => {
 	const { t } = useTranslation();
 
 	const {
@@ -65,7 +72,7 @@ export const Navigation: React.FC<NavigationInterface> = ({ items }) => {
 							</div>
 							<div className="hidden md:block">
 								<div className="ml-4 flex items-center md:ml-6">
-									<UserNavigation />
+									<UserNavigation items={userNavigation} />
 								</div>
 							</div>
 							<div className="-mr-2 flex md:hidden">

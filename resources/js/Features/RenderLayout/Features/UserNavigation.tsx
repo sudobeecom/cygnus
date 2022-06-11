@@ -7,10 +7,18 @@ import { useTranslation } from "react-i18next";
 import { PagePropsType } from "../../../Interfaces/PagePropsType";
 import { Icon } from "../../Icon";
 
-// eslint-disable-next-line
-interface UserNavigationInterface {}
+export interface UserNavigationItemInterface {
+	title: string | null;
+	route: string;
+}
 
-export const UserNavigation: React.FC<UserNavigationInterface> = () => {
+interface UserNavigationInterface {
+	items: UserNavigationItemInterface[];
+}
+
+export const UserNavigation: React.FC<UserNavigationInterface> = ({
+	items,
+}) => {
 	const { t } = useTranslation();
 
 	const { user, balance } = usePage<PagePropsType>().props;
@@ -90,23 +98,16 @@ export const UserNavigation: React.FC<UserNavigationInterface> = () => {
 								</>
 							)}
 
-							<Menu.Item>
-								<InertiaLink
-									className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-100"
-									href="/settings/billing"
-								>
-									{t("Add funds")}
-								</InertiaLink>
-							</Menu.Item>
-
-							<Menu.Item>
-								<InertiaLink
-									className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-100"
-									href="/account/settings"
-								>
-									{t("Settings")}
-								</InertiaLink>
-							</Menu.Item>
+							{items.map(({ title, route }) => (
+								<Menu.Item>
+									<InertiaLink
+										className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-100"
+										href={route}
+									>
+										{title}
+									</InertiaLink>
+								</Menu.Item>
+							))}
 
 							{user !== null && (
 								<Menu.Item>
