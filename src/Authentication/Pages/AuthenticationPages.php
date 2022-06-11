@@ -8,23 +8,76 @@ use SudoBee\Cygnus\Authentication\Operations\LogoutOperation;
 
 class AuthenticationPages
 {
-	public static function register(): void
+	private static bool $enableRegistration = false;
+
+	private static bool $enablePasswordReset = false;
+
+	/** @var array<int, mixed>|string|null  */
+	private array|string|null $guestMiddleware = "guest";
+
+	public static function make(): self
 	{
-		Route::middleware(config("cygnus.guest_middlewares"))->group(
-			function () {
-				LoginPage::register();
+		return new self();
+	}
 
-				if (config("cygnus.enable_registration")) {
-					RegisterPage::register();
-				}
+	public static function isRegistrationEnabled(): bool
+	{
+		return self::$enableRegistration;
+	}
 
-				if (config("cygnus.enable_reset_password")) {
-					ForgotPasswordPage::register();
-					ForgotPasswordEmailSentPage::register();
-					ResetPasswordPage::register();
-				}
+	public static function isPasswordResetEnabled(): bool
+	{
+		return self::$enablePasswordReset;
+	}
+
+	/**
+	 * @param bool $enable
+	 * @return static
+	 */
+	public function enableRegistration(bool $enable = true)
+	{
+		self::$enableRegistration = $enable;
+
+		return $this;
+	}
+
+	/**
+	 * @param bool $enable
+	 * @return static
+	 */
+	public function enablePasswordReset(bool $enable = true)
+	{
+		self::$enablePasswordReset = $enable;
+
+		return $this;
+	}
+
+	/**
+	 * @param array<int, mixed>|string|null $middleware
+	 * @return static
+	 */
+	public function setGuestMiddleware(array|string|null $middleware)
+	{
+		$this->guestMiddleware = $middleware;
+
+		return $this;
+	}
+
+	public function register(): void
+	{
+		Route::middleware($this->guestMiddleware ?? [])->group(function () {
+			LoginPage::register();
+
+			if (self::isRegistrationEnabled()) {
+				RegisterPage::register();
 			}
-		);
+
+			if (self::isPasswordResetEnabled()) {
+				ForgotPasswordPage::register();
+				ForgotPasswordEmailSentPage::register();
+				ResetPasswordPage::register();
+			}
+		});
 
 		LogoutOperation::register();
 

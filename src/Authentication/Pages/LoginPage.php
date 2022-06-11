@@ -9,8 +9,6 @@ use SudoBee\Cygnus\Component\Components\Text;
 use SudoBee\Cygnus\Layout\Layout;
 use SudoBee\Cygnus\Layout\Layouts\CentralLayout;
 use SudoBee\Cygnus\Page\Page;
-use SudoBee\Cygnus\Page\Utilities\Link as Linker;
-use Illuminate\Support\Facades\Route;
 
 class LoginPage extends Page
 {
@@ -33,7 +31,7 @@ class LoginPage extends Page
 	{
 		$layout = CentralLayout::make()->setTitle($this->title());
 
-		if (config("cygnus.enable_registration")) {
+		if (AuthenticationPages::isRegistrationEnabled()) {
 			$layout->setSubtitle(
 				Text::make(
 					"Or ",

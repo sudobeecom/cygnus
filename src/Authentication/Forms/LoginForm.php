@@ -3,6 +3,7 @@
 namespace SudoBee\Cygnus\Authentication\Forms;
 
 use App\Providers\RouteServiceProvider;
+use SudoBee\Cygnus\Authentication\Pages\AuthenticationPages;
 use SudoBee\Cygnus\Authentication\Pages\ForgotPasswordPage;
 use SudoBee\Cygnus\Component\Components\Flex\Enums\Justify;
 use SudoBee\Cygnus\Component\Components\Flex\Flex;
@@ -38,7 +39,7 @@ class LoginForm extends ProcessableForm
 						->setTitle("Forgot your password?")
 						->setTextAlign(Align::RIGHT)
 						->toPage(ForgotPasswordPage::class)
-						->show(config("cygnus.enable_reset_password")),
+						->show(AuthenticationPages::isPasswordResetEnabled()),
 				]),
 			FormButton::make()->setTitle("Login"),
 		]);
