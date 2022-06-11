@@ -12,12 +12,32 @@ class AuthenticationPages
 
 	private static bool $enablePasswordReset = false;
 
-	/** @var array<int, mixed>|string|null  */
-	private array|string|null $guestMiddleware = "guest";
+	private static bool $enableUserEditPage = false;
 
-	public static function make(): self
-	{
-		return new self();
+	/**
+	 * @param array<int, mixed>|string $authenticatedMiddlewares
+	 * @param array<int, mixed>|string $guestMiddlewares
+	 */
+	public function __construct(
+		private readonly array|string $authenticatedMiddlewares,
+		private readonly array|string $guestMiddlewares
+	) {
+		//
+	}
+
+	/**
+	 * @param array<int, mixed>|string $authenticatedMiddlewares
+	 * @param array<int, mixed>|string $guestMiddlewares
+	 * @return AuthenticationPages
+	 */
+	public static function make(
+		array|string $authenticatedMiddlewares,
+		array|string $guestMiddlewares
+	): self {
+		return new self(
+			authenticatedMiddlewares: $authenticatedMiddlewares,
+			guestMiddlewares: $guestMiddlewares
+		);
 	}
 
 	public static function isRegistrationEnabled(): bool
@@ -28,6 +48,11 @@ class AuthenticationPages
 	public static function isPasswordResetEnabled(): bool
 	{
 		return self::$enablePasswordReset;
+	}
+
+	public static function isUserEditPageEnabled(): bool
+	{
+		return self::$enableUserEditPage;
 	}
 
 	/**
@@ -53,19 +78,19 @@ class AuthenticationPages
 	}
 
 	/**
-	 * @param array<int, mixed>|string|null $middleware
+	 * @param bool $enable
 	 * @return static
 	 */
-	public function setGuestMiddleware(array|string|null $middleware)
+	public function enableUserEditPage(bool $enable = true)
 	{
-		$this->guestMiddleware = $middleware;
+		self::$enableUserEditPage = $enable;
 
 		return $this;
 	}
 
 	public function register(): void
 	{
-		Route::middleware($this->guestMiddleware ?? [])->group(function () {
+		Route::middleware($this->guestMiddlewares)->group(function () {
 			LoginPage::register();
 
 			if (self::isRegistrationEnabled()) {
@@ -76,6 +101,12 @@ class AuthenticationPages
 				ForgotPasswordPage::register();
 				ForgotPasswordEmailSentPage::register();
 				ResetPasswordPage::register();
+			}
+		});
+
+		Route::middleware($this->authenticatedMiddlewares)->group(function () {
+			if (self::isUserEditPageEnabled()) {
+				UserEditPage::register();
 			}
 		});
 

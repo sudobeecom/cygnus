@@ -2,6 +2,8 @@
 
 namespace SudoBee\Cygnus\Page\Resolvers;
 
+use SudoBee\Cygnus\Authentication\Pages\AuthenticationPages;
+use SudoBee\Cygnus\Authentication\Pages\UserEditPage;
 use SudoBee\Cygnus\Page\Objects\UserNavigationItem;
 
 class UserNavigationResolver
@@ -28,6 +30,13 @@ class UserNavigationResolver
 	 */
 	public function getNavigationItems(): array
 	{
+		if (AuthenticationPages::isUserEditPageEnabled()) {
+			return [
+				UserNavigationItem::fromPage(UserEditPage::class),
+				...$this->navigationItems,
+			];
+		}
+
 		return $this->navigationItems;
 	}
 }

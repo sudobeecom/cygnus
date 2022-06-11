@@ -3,6 +3,9 @@
 namespace SudoBee\Cygnus\Authentication\Forms;
 
 use App\Providers\RouteServiceProvider;
+use Illuminate\Validation\Rule;
+use SudoBee\Cygnus\Authentication\Actions\CreateOrUpdateUserAction;
+use SudoBee\Cygnus\Authentication\Factories\UserFormFactory;
 use SudoBee\Cygnus\Form\Fields\TextField;
 use SudoBee\Cygnus\Form\Form;
 use SudoBee\Cygnus\Form\Form\FormButton;
@@ -21,23 +24,20 @@ class RegisterForm extends ProcessableForm
 
 	protected function form(Form $form): Form
 	{
-		return $form->withoutPanel()->setNodes([
-			TextField::make("Full name"),
-			TextField::make("Email")
-				->presetEmail()
-				->addValidationRule("unique:users"),
-			TextField::make("Password")->presetPassword(),
-			FormButton::make()->setTitle("Register"),
-		]);
+		return $form
+			->withoutPanel()
+			->setNodes([
+				...UserFormFactory::fields(user: null),
+				FormButton::make()->setTitle("Register"),
+			]);
 	}
 
 	public function handle(object $validated)
 	{
-		$user = User::create([
-			"name" => $validated->full_name,
-			"email" => $validated->email,
-			"password" => Hash::make($validated->password),
-		]);
+		$user = app(CreateOrUpdateUserAction::class)->execute(
+			validated: $validated,
+			user: null
+		);
 
 		Auth::login($user);
 
