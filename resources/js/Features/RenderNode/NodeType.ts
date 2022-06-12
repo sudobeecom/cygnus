@@ -43,6 +43,7 @@ import { ChartInterface } from "./Nodes/Chart/Chart";
 import { ShopConnectionPanelInterface } from "../ShopConnectionPanel";
 import { AlertBannerInterface } from "./Nodes/AlertBanner";
 import { TextareaFieldInterface } from "./Nodes/Form/Fields/TextareaField";
+import { MetricInterface } from "./Nodes/Metric/Metric";
 
 export type NodeType =
 	| GridInterface
@@ -88,5 +89,6 @@ export type NodeType =
 	| SplitterInterface
 	| BalanceInformationInterface
 	| ChartInterface
+	| MetricInterface
 	| ShopConnectionPanelInterface
 	| AlertBannerInterface;

@@ -22,6 +22,8 @@ class Chart extends Component
 
 	private bool $isStacked = false;
 
+	private int $height = 320;
+
 	public static function make(): self
 	{
 		return new self();
@@ -80,15 +82,27 @@ class Chart extends Component
 		return $this;
 	}
 
+	/**
+	 * @param int $height
+	 * @return static
+	 */
+	public function setHeight(int $height): self
+	{
+		$this->height = $height;
+
+		return $this;
+	}
+
 	public function export(): array
 	{
 		return ExportBuilder::make($this)
+			->addNodesProperty("dataSets", $this->dataSets)
 			->addProperty("labels", $this->labels)
 			->addProperty("dataType", $this->dataType)
 			->addProperty("xAxisLabel", __($this->xAxisLabel))
 			->addProperty("yAxisLabel", __($this->yAxisLabel))
 			->addProperty("stacked", $this->isStacked)
-			->addNodesProperty("dataSets", $this->dataSets)
+			->addProperty("height", $this->height)
 			->export();
 	}
 }

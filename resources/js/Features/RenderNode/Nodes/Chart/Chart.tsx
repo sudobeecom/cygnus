@@ -16,6 +16,7 @@ export interface ChartInterface {
 	xAxisLabel: string | null;
 	yAxisLabel: string | null;
 	stacked: boolean;
+	height: number;
 }
 
 export const Chart: React.FC<ChartInterface> = ({
@@ -25,9 +26,10 @@ export const Chart: React.FC<ChartInterface> = ({
 	xAxisLabel,
 	yAxisLabel,
 	stacked,
+	height,
 }) => {
 	return (
-		<div className="relative h-[320px] w-full">
+		<div className="relative w-full" style={{ height: `${height}px` }}>
 			<Bar
 				data={{
 					labels,

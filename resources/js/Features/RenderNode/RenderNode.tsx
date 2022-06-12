@@ -45,6 +45,7 @@ import { Chart } from "./Nodes/Chart/Chart";
 import { ShopConnectionPanel } from "../ShopConnectionPanel";
 import { AlertBanner } from "./Nodes/AlertBanner";
 import { TextareaField } from "./Nodes/Form/Fields/TextareaField";
+import { Metric } from "./Nodes/Metric/Metric";
 
 export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
 	/**
@@ -99,6 +100,7 @@ export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
 		Splitter,
 		BalanceInformation,
 		Chart,
+		Metric,
 		ShopConnectionPanel,
 		AlertBanner,
 		...customComponents,

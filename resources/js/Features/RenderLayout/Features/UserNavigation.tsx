@@ -98,8 +98,8 @@ export const UserNavigation: React.FC<UserNavigationInterface> = ({
 								</>
 							)}
 
-							{items.map(({ title, route }) => (
-								<Menu.Item>
+							{items.map(({ title, route }, index) => (
+								<Menu.Item key={index}>
 									<InertiaLink
 										className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-100"
 										href={route}
