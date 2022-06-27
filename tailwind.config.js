@@ -42,7 +42,7 @@ module.exports = {
 				background: "#F4F5F7",
 			},
 			fontFamily: {
-				base: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+				base: '"Inter", sans-serif',
 			},
 		},
 	},

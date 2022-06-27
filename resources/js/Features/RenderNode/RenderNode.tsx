@@ -46,15 +46,9 @@ import { ShopConnectionPanel } from "../ShopConnectionPanel";
 import { AlertBanner } from "./Nodes/AlertBanner";
 import { TextareaField } from "./Nodes/Form/Fields/TextareaField";
 import { Metric } from "./Nodes/Metric/Metric";
+import { Cygnus } from "../../Cygnus";
 
 export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
-	/**
-	 * Temporary extension for components
-	 */
-	const customComponents: { nodeType: string; [key: string]: any } = (
-		window as any
-	).cygnusCustomComponents;
-
 	// eslint-disable-next-line
 	const Component: React.FC<any> = {
 		Grid,
@@ -103,7 +97,7 @@ export const RenderNode: React.FC<NodeType> = ({ nodeType, ...props }) => {
 		Metric,
 		ShopConnectionPanel,
 		AlertBanner,
-		...customComponents,
+		...Cygnus.getCustomNodes(),
 	}[nodeType];
 
 	if (Component) {

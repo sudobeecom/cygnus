@@ -33,7 +33,10 @@ export const FieldLabel: React.FC<FieldLabelInterface> = ({
 
 			{explanation !== null && (
 				<Tippy content={explanation}>
-					<div className="rounded-[3px] bg-gray-500 bg-opacity-80 p-[1px]">
+					<div
+						key="content"
+						className="rounded-[3px] bg-gray-500 bg-opacity-80 p-[1px]"
+					>
 						<svg
 							className="h-[10px] w-[10px] text-white"
 							viewBox="0 0 10 10"
